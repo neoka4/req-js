@@ -1,0 +1,229 @@
+<!doctype html>
+<html>
+<head>
+<title>Eg.1 - RequireJS</title>
+<meta charset="utf-8">
+<script data-main="" src="js/lib/require.js"></script>
+<script>
+
+ // 4. Глобальные переменные из не AMD-модулей доступны везде после асинхронной загрузки содержащего их модуля. exports из shim в requirejs.config для этого не требуется.
+ // 5. При подключении не AMD-модулей в require() их только нужно описывать, как зависимости, но не создавать псевдонимы зависимостей, как параметры function()
+ // 6. Модули плагины jQuery являются не AMD-модулями. После их асинхронной загрузки, глобальные переменные $ и jQuery становятся доступными отовсюду благодаря загрузке зависимости от jQuery/
+ // При этом исспользовать разные версии jQuery в разных модулях не удаётся, т.к. при указании зависимости  от jQuery ( define(['jquery'], function() {...}) ), потом нет возможности 
+ // передать её в function(), как параметр-зависимость, потому что современные версии jQuery прописывают себя, как именованный AMD-модуль под названием "jquery", 
+ // создавая при этом глобальные переменные $ и jQuery, но всёже получилось,  как в примере #8
+
+
+/* // 13 - work
+requirejs.config({
+	baseUrl: "js/lib",
+	paths: {
+		domReady: 'requires-plugins/domReady',
+		textPluginAlias: 'requires-plugins/text',
+		firstHtmlTemplate: '../templates/first.html',
+	},
+});
+
+require(['textPluginAlias!firstHtmlTemplate', 'domReady', 'notAmdModule'], function(firstHtmlTemplate, domReady, neoModule){
+	domReady(function(){
+		NeoModule.grab("#res").append(firstHtmlTemplate);
+	});
+});
+*/
+
+/* // 12 - work
+requirejs.config({
+	baseUrl: "js/lib",
+	paths: {
+		domReady: 'requires-plugins/domReady',
+		text: 'requires-plugins/text',
+		firstHtmlTemplate: '../templates/first.html',
+	},
+});
+
+require(['text!firstHtmlTemplate', 'domReady', 'notAmdModule'], function(firstHtmlTemplate, domReady, neoModule){
+	domReady(function(){
+		NeoModule.grab("#res").append(firstHtmlTemplate);
+	});
+});
+*/
+
+/* // 11 - work
+requirejs.config({
+	baseUrl: "js/lib",
+	paths: {
+		domReady: 'requires-plugins/domReady',
+		text: 'requires-plugins/text',
+	},
+});
+
+require(['text!../templates/first.html', 'domReady', 'notAmdModule'], function(firstHtmlTemplate, domReady, neoModule){
+	domReady(function(){
+		NeoModule.grab("#res").append(firstHtmlTemplate);
+	});
+});
+*/
+
+/* // 10
+requirejs.config({
+	baseUrl: "js/lib",
+	paths: {
+		domReady: 'requires-plugins/domReady',
+	},
+});
+
+require(['domReady', 'notAmdModule'], function(domReady, neoModule){
+	domReady(function(){
+		document.getElementById("res").innerHTML = "domReady tested!<br>";
+		NeoModule.grab("#res").append("not AMD module with alias 'notAmdModule' and global variable 'neoModule' inside it loaded");
+	});
+});
+*/
+
+/* // 9 - work
+requirejs.config({
+	baseUrl: "js/lib",
+	paths: {
+		domReady: 'requires-plugins/domReady',
+	},
+});
+
+require(['domReady', 'notAmdModule'], function(domReady, neoModule){
+	domReady(function(){
+		document.getElementById("res").innerHTML = "domReady tested!<br>";
+		NeoModule.grab("#res").append("not AMD module with alias 'notAmdModule' and global variable 'neoModule' inside it loaded");
+	});
+});
+*/
+
+/* // 8 - work - по маньюалу не вышло для разных версий jQuery, но получилось так
+requirejs.config({
+	baseUrl: 'js/lib',
+	paths: {
+		'jquery-1.9.1': 'jquery-1.9.1.min',
+	},
+	map: {
+		'*': {'jquery': 'jquery-2.1.4.min'},
+		'oldTest': {'jquery': 'jquery-old'},
+	},
+});
+
+require(['oldTest', 'newTest'], function(oldTest, newTest) {
+	$(function() {
+		oldTest.showJQueryVersion();
+		newTest.showJQueryVersion();
+		
+		console.log($.fn.jquery);
+	});
+});
+*/
+
+/* // 7 - work
+requirejs.config({
+	baseUrl: 'js/lib',
+	paths: {
+		'jquery': 'jquery-1.9.1.min',
+	},
+	map: {
+		'oldTest': {'amdModule': 'amdModule_old'},
+		'newTest': {'amdModule': 'amdModule'},
+	},
+});
+
+require(['oldTest', 'newTest'], function(oldTest, newTest) {
+	$(function() {
+		oldTest.showVersion();
+		newTest.showVersion();
+	});
+});
+*/
+
+/* // 6 - work
+requirejs.config({
+	baseUrl: 'js/lib',
+	paths: {
+		jquery: 'jquery-1.9.1.min',
+	},
+	shim: {
+		'jquery.alpha': ['jquery'],
+	},
+});
+
+require(['jquery.alpha'], function() {
+	jQuery(function() {
+		$('#res').alpha();
+	});
+});
+
+window.setTimeout('$("#res").alpha(" by setTimeot")', 2000);
+*/
+
+/* // 5 - work
+require(['js/lib/notAmdModule'], sayItLoaded);
+
+window.setTimeout("sayItLoaded(' by setTimeout')", 1000);
+
+function sayItLoaded(phrase) {
+	NeoModule.grab("#res").append("not AMD module with alias 'notAmdModule' and global variable 'neoModule' inside it loaded" + (phrase ? phrase : "") + "<br>");
+}
+*/
+
+/* // 4 - work
+require(['js/lib/amdModule'], function(amdModule5) {
+	amdModule5.grab("#res").html("module amdModule loaded without config");
+});
+*/
+
+/* // 3 - work
+requirejs.config({
+	baseUrl: "js/lib/",
+	paths: {
+		'jquery': 'jquery-1.9.1.min',
+	},
+});
+
+require(['amdModule', 'jquery'], function(amdModule333){
+	$(function(){
+		amdModule333.grab("#res").html("AMD module loaded");
+	});
+});
+*/
+
+/* // 2 - work
+requirejs.config({
+	baseUrl: "js/lib/",
+	paths: {
+		'jquery': 'jquery-1.9.1.min',
+	},
+});
+
+require(['jquery'], function($){
+	$(function(){
+		$("#res").html("Load module via baseUrl and paths");
+	});
+});
+*/
+
+/* // 1 - work
+requirejs.config({
+	paths: {
+		'jquery': [
+			'https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery!!!',
+			'js/lib/jquery-1.9.1.min',
+		],
+	},
+});
+
+require(['jquery'], function($){
+	$(function(){
+		$("#res").html("Load jQuery from alternative localtion if load failures from remote CDN");
+	});
+});
+*/
+</script>
+</head>
+<body>
+    <h1>Example - RequireJS</h1>
+    <h2 id="res"></h2>
+</body>
+</html>
